@@ -1,0 +1,28 @@
+[project]
+name = "textual-tags"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Zaloog", email = "gramslars@gmail.com" }
+]
+requires-python = ">=3.8.1"
+dependencies = [
+    "textual>=3.1.0",
+]
+
+[project.scripts]
+textual-tags = "textual_tags.demo:run_demo"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=3.5.0",
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=5.0.0",
+    "textual-dev>=1.7.0",
+]

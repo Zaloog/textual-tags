@@ -1,0 +1,26 @@
+Tags {
+    height:auto;
+    width:50;
+    border:red;
+}
+TagInput {
+    margin:0;
+    height: auto;
+    width: 1fr;
+    min-width:16;
+    border:none;
+}
+Tag {
+    margin:0 1 0 0 ;
+    background:$primary-lighten-2;
+
+    &:hover {
+        background:$primary-darken-2;
+        tint: 10%;
+    }
+    &:focus {
+        background:$primary-darken-2;
+        tint: 10%;
+    }
+
+}
