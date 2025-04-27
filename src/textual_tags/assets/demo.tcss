@@ -1,7 +1,7 @@
 Tags {
     height:auto;
+    min-height:5;
     width:50;
-    border:red;
 }
 TagInput {
     margin:0;
@@ -23,4 +23,7 @@ Tag {
         tint: 10%;
     }
 
+}
+#input_adder {
+    width:50;
 }

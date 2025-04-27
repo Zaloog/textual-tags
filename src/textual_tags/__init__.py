@@ -1,10 +1,28 @@
+from __future__ import annotations
+
 from textual.reactive import reactive
 from textual.app import RenderResult
 from textual.events import Key
 from textual.message import Message
 from textual.widgets import Input, Label
+from textual_autocomplete import AutoComplete, DropdownItem, TargetState
 
 from textual_tags.flexbox import FlexBoxContainer
+
+
+class TagAutoComplete(AutoComplete):
+    class Applied(Message):
+        def __init__(self, autocomplete: TagAutoComplete) -> None:
+            self.autocomplete = autocomplete
+            super().__init__()
+
+        @property
+        def control(self):
+            return self.autocomplete
+
+    def post_completion(self):
+        self.action_hide()
+        self.post_message(self.Applied(autocomplete=self))
 
 
 class TagInput(Input):
@@ -35,7 +53,7 @@ class Tag(Label):
     can_focus = True
 
     class Removed(Message):
-        def __init__(self, tag) -> None:
+        def __init__(self, tag: Tag) -> None:
             self.tag = tag
             super().__init__()
 
@@ -65,26 +83,59 @@ class Tags(FlexBoxContainer):
     Tags {
     }
     """
-    tag_list: reactive[list[str]] = reactive([])
+    tag_values: reactive[set[str]] = reactive(set())
 
-    def __init__(self, tag_list: list = []) -> None:
+    def __init__(
+        self, tag_values: list | set | None = None, allow_all: bool = False
+    ) -> None:
+        """An autocomplete widget for filesystem paths.
+
+        Args:
+            tag_values: The target input widget to autocomplete.
+            allow_all: Allow adding any value as tag, not just predefined ones (default=False)
+            id: The DOM node id of the widget.
+            classes: The CSS classes of the widget.
+            disabled: Whether the widget is disabled.
+        """
+        if isinstance(tag_values, list):
+            tag_values_set = set(tag_values)
+
         super().__init__()
+        self.tag_values = tag_values_set
 
     def on_mount(self):
-        self.query_one(TagInput).placeholder = "Enter a tag:"
+        self.query_one(TagInput).placeholder = "Enter a tag..."
 
     def compose(self):
-        TAG_ENTRIES = ["Textual", "is", "awesome", "Cool"]
-        for entry in TAG_ENTRIES:
-            yield Tag(entry)
-        yield TagInput(id="input_tag")
+        tag_input = TagInput(id="input_tag")
+        yield tag_input
 
-    def on_tag_removed(self, event: Tag.Removed):
-        self.notify(event.tag.renderable)
-        event.tag.remove()
+        yield TagAutoComplete(
+            target=tag_input, candidates=self.update_autocomplete_candidates
+        )
+
+    async def _on_tag_removed(self, event: Tag.Removed):
+        await event.tag.remove()
+
+    def update_autocomplete_candidates(self, state: TargetState) -> list[DropdownItem]:
+        return [DropdownItem(unselected_tag) for unselected_tag in self.unselected_tags]
+
+    async def _on_tag_auto_complete_applied(self, event: TagAutoComplete.Applied):
+        await event.autocomplete.target.action_submit()
 
     def on_input_submitted(self, event: Input.Submitted):
         value = event.input.value
-        if value:
+        if value in self.tag_values:
             self.mount(Tag(value), before="#input_tag")
             self.query_one(Input).clear()
+
+    def clear_tags(self):
+        self.query(Tag).remove()
+
+    @property
+    def selected_tags(self) -> set[str]:
+        return {tag.renderable for tag in self.query(Tag)}
+
+    @property
+    def unselected_tags(self) -> set[str]:
+        return self.tag_values.difference(self.selected_tags)

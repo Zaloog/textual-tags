@@ -6,9 +6,10 @@ readme = "README.md"
 authors = [
     { name = "Zaloog", email = "gramslars@gmail.com" }
 ]
-requires-python = ">=3.8.1"
+requires-python = ">=3.10"
 dependencies = [
     "textual>=3.1.0",
+    "textual-autocomplete>=4.0.4",
 ]
 
 [project.scripts]
