@@ -53,6 +53,7 @@ class Tag(Label):
     RIGHT_END = "\ue0b6"
     LEFT_END = "\ue0b4"
 
+    show_x: reactive[bool] = reactive(False)
     can_focus = True
 
     class Removed(Message):
@@ -67,9 +68,11 @@ class Tag(Label):
     def render(self) -> RenderResult:
         background = self.styles.background.hex
         parent_background = self.colors[0].hex
+        x_part = " x" if self.show_x else ""
         return (
             f"[{background} on {parent_background}]{self.RIGHT_END}[/]"
             + str(self.renderable)
+            + x_part
             + f"[{background} on {parent_background}]{self.LEFT_END}[/]"
         )
 
@@ -80,6 +83,9 @@ class Tag(Label):
         if event.key == "enter":
             self.post_message(self.Removed(self))
 
+    def watch_show_x(self):
+        self.render()
+
 
 class Tags(FlexBoxContainer):
     DEFAULT_CSS = """
@@ -87,9 +93,13 @@ class Tags(FlexBoxContainer):
     }
     """
     tag_values: reactive[set[str]] = reactive(set())
+    show_x: reactive[bool] = reactive(False)
 
     def __init__(
-        self, tag_values: list | set | None = None, allow_all: bool = False
+        self,
+        tag_values: list | set | None = None,
+        show_x: bool = False,
+        allow_all: bool = False,
     ) -> None:
         """An autocomplete widget for filesystem paths.
 
@@ -129,7 +139,7 @@ class Tags(FlexBoxContainer):
     def on_input_submitted(self, event: Input.Submitted):
         value = event.input.value
         if value in self.tag_values:
-            self.mount(Tag(value), before="#input_tag")
+            self.mount(Tag(value).data_bind(Tags.show_x), before="#input_tag")
             self.query_one(Input).clear()
 
     def clear_tags(self):

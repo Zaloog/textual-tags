@@ -2,18 +2,20 @@ Tags {
     height:auto;
     min-height:5;
     width:50;
+    border:tall $primary;
 }
 TagInput {
     margin:0;
     padding:0;
     height: auto;
-    width: 1fr;
+    width: auto;
     min-width:20;
     border:none;
 }
 Tag {
     margin:0 1 0 0 ;
-    background:$primary-lighten-2;
+    color:$primary-lighten-2;
+    background:$panel;
 
     &:hover {
         background:$primary-darken-2;
@@ -27,4 +29,9 @@ Tag {
 }
 #input_adder {
     width:50;
+    border:$primary;
+}
+#switch_x {
+    width:50;
+    border:$primary;
 }
