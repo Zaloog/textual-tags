@@ -1,4 +1,5 @@
 Tags {
+    padding:0 0 0 1 ;
     height:auto;
     min-height:5;
     width:50;
@@ -31,7 +32,7 @@ Tag {
     width:50;
     border:$primary;
 }
-#switch_x {
+.switch-toggles {
     width:50;
     border:$primary;
 }

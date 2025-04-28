@@ -1,0 +1,3 @@
+# Textual-Tags
+
+requires NerdFont

@@ -50,8 +50,8 @@ class Tag(Label):
         }
     }
     """
-    RIGHT_END = "\ue0b6"
-    LEFT_END = "\ue0b4"
+    RIGHT_END = "\ue0b4"
+    LEFT_END = "\ue0b6"
 
     show_x: reactive[bool] = reactive(False)
     can_focus = True
@@ -68,13 +68,13 @@ class Tag(Label):
     def render(self) -> RenderResult:
         background = self.styles.background.hex
         parent_background = self.colors[0].hex
-        x_part = " x" if self.show_x else ""
-        return (
-            f"[{background} on {parent_background}]{self.RIGHT_END}[/]"
-            + str(self.renderable)
-            + x_part
-            + f"[{background} on {parent_background}]{self.LEFT_END}[/]"
-        )
+        # Add extra padding with single space if self.show_x == False
+        # To prevent layout change if its toggled
+        left_round_part = f"[{background} on {parent_background}]{self.LEFT_END}[/]"
+        right_round_part = f"[{background} on {parent_background}]{self.RIGHT_END}[/]"
+        label_part = f"{self.renderable}" if self.show_x else f" {self.renderable}"
+        x_part = " x" if self.show_x else " "
+        return left_round_part + label_part + x_part + right_round_part
 
     def on_click(self):
         self.post_message(self.Removed(self))
@@ -94,18 +94,20 @@ class Tags(FlexBoxContainer):
     """
     tag_values: reactive[set[str]] = reactive(set())
     show_x: reactive[bool] = reactive(False)
+    allow_new_tags: reactive[bool] = reactive(False)
 
     def __init__(
         self,
         tag_values: list | set | None = None,
         show_x: bool = False,
-        allow_all: bool = False,
+        allow_new_tags: reactive[bool] = reactive(False),
     ) -> None:
         """An autocomplete widget for filesystem paths.
 
         Args:
             tag_values: The target input widget to autocomplete.
-            allow_all: Allow adding any value as tag, not just predefined ones (default=False)
+            show_x: Puts a `X` behind the actual tag-label (default=False)
+            allow_new_tags: Allow adding any value as tag, not just predefined ones (default=False)
             id: The DOM node id of the widget.
             classes: The CSS classes of the widget.
             disabled: Whether the widget is disabled.
@@ -124,11 +126,13 @@ class Tags(FlexBoxContainer):
         yield tag_input
 
         yield TagAutoComplete(
-            target=tag_input, candidates=self.update_autocomplete_candidates
+            target=tag_input,
+            candidates=self.update_autocomplete_candidates,
         )
 
     async def _on_tag_removed(self, event: Tag.Removed):
         await event.tag.remove()
+        self.query_one(TagInput).focus()
 
     def update_autocomplete_candidates(self, state: TargetState) -> list[DropdownItem]:
         return [DropdownItem(unselected_tag) for unselected_tag in self.unselected_tags]
@@ -137,10 +141,16 @@ class Tags(FlexBoxContainer):
         await event.autocomplete.target.action_submit()
 
     def on_input_submitted(self, event: Input.Submitted):
-        value = event.input.value
-        if value in self.tag_values:
+        value = event.input.value.strip()
+        # Dont allow empty Tags
+        if not value:
+            return
+        if value in self.tag_values or self.allow_new_tags:
             self.mount(Tag(value).data_bind(Tags.show_x), before="#input_tag")
             self.query_one(Input).clear()
+
+            if value not in self.tag_values:
+                self.tag_values.add(value)
 
     def clear_tags(self):
         self.query(Tag).remove()

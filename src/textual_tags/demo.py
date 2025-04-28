@@ -15,10 +15,13 @@ class DemoApp(App):
             placeholder="Add more tags to internal widget list", id="input_adder"
         )
         input.border_title = "Add more Tags here"
-        switch = Switch(id="switch_x")
-        switch.border_title = "Show X at end of each tag"
+        switch_x = Switch(id="switch_x", classes="switch-toggles")
+        switch_x.border_title = "Show X at end of each tag"
+        switch_new = Switch(id="switch_new", classes="switch-toggles")
+        switch_new.border_title = "Allow New Tags"
         yield input
-        yield switch
+        yield switch_x
+        yield switch_new
 
         return super().compose()
 
@@ -27,8 +30,13 @@ class DemoApp(App):
         self.query_one(Tags).tag_values.add(event.input.value)
         event.input.clear()
 
-    def on_switch_changed(self, event: Switch.Changed):
+    @on(Switch.Changed, "#switch_x")
+    def update_show_x(self, event: Switch.Changed):
         self.query_one(Tags).show_x = event.switch.value
+
+    @on(Switch.Changed, "#switch_new")
+    def update_allow_new_tags(self, event: Switch.Changed):
+        self.query_one(Tags).allow_new_tags = event.switch.value
 
 
 def run_demo():
