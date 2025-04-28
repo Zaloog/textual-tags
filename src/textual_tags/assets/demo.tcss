@@ -5,9 +5,10 @@ Tags {
 }
 TagInput {
     margin:0;
+    padding:0;
     height: auto;
     width: 1fr;
-    min-width:16;
+    min-width:20;
     border:none;
 }
 Tag {

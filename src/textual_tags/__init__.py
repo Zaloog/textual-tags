@@ -31,6 +31,9 @@ class TagInput(Input):
     }
     """
 
+    def on_focus(self):
+        self.parent.query_one(TagAutoComplete).action_show()
+
 
 class Tag(Label):
     DEFAULT_CSS = """
