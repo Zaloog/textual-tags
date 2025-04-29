@@ -199,12 +199,31 @@ class Tags(FlexBoxContainer):
 
     async def on_input_submitted(self, event: Input.Submitted):
         value = event.input.value.strip()
-        # Dont allow empty Tags
+        # Prevent empty Tags
         if not value:
             return
-        if value in self.tag_values or self.allow_new_tags:
-            await self.add_new_tag(value=value)
-            self.query_one(Input).clear()
+        # Prevent non pre-defined entries if not allowed
+        if (value not in self.tag_values) and (not self.allow_new_tags):
+            # self.notify(
+            #     title='Invalid Tag',
+            #     message='Adding new tags is not allowed',
+            #     severity='warning',
+            #     timeout=2
+            # )
+            return
+
+        # Prevent already selected tags
+        if value in self.selected_tags:
+            # self.notify(
+            #     title='Invalid Tag',
+            #     message='Tag already present',
+            #     severity='warning',
+            #     timeout=2
+            # )
+            return
+
+        await self.add_new_tag(value=value)
+        self.query_one(Input).clear()
 
     async def _populate_with_tags(self):
         for tag in self.tag_values:
