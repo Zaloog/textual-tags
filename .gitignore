@@ -11,3 +11,4 @@ wheels/
 
 # Temp Files
 .coverage
+*.DS_Store
