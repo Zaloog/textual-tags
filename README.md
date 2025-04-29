@@ -8,7 +8,7 @@
 
 # textual-tags
 
-![Image]
+![demo_image](https://raw.githubusercontent.com/Zaloog/textual-tags/main/images/textual_tags_image.png)
 This library provides a custom tags widget called `Tags`,
 which can be easily added into your existing [textual] application.
 
