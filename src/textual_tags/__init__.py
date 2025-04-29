@@ -226,7 +226,6 @@ class Tags(FlexBoxContainer):
         await last_tag.remove()
         self.query_one(TagInput).value = last_tag.value
         self.query_one(TagInput).cursor_position = len(last_tag.value)
-        self.mutate_reactive(Tags.tag_values)
 
     def action_next_hightlight(self):
         """go to next hightlight in completion option list"""
