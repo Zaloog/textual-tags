@@ -9,6 +9,7 @@
 # textual-tags
 
 ![demo_image](https://raw.githubusercontent.com/Zaloog/textual-tags/main/images/textual_tags_image.png)
+
 This library provides a custom tags widget called `Tags`,
 which can be easily added into your existing [textual] application.
 
@@ -42,6 +43,9 @@ uvx textual-tags
 ```
 
 ## Usage
+Here is an exampke usage of the `Tags`-widget in a textual App. You can also check the demo app
+[here](https://github.com/Zaloog/textual-tags/blob/main/src/textual_tags/demo.py).
+
 ```python
 from textual.app import App
 
@@ -85,10 +89,11 @@ def main():
 if __name__ == '__main__':
     main()
 ```
+
 ## Messages
 Tags sends two messages:
-- `Tag.Removed`, if a tag is removed in any way
-- `TagAutoComplete.Applied`, if a completion option is applied
+- `Tag.Removed`, send when a tag is removed in any way
+- `TagAutoComplete.Applied`, send when a completion option is applied
 
 ## Issues/Feedback
 Feel free to reach out and share your feedback, or open an [Issue],

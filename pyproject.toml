@@ -1,7 +1,7 @@
 [project]
 name = "textual-tags"
 version = "0.1.0"
-description = "Add your description here"
+description = "A custom tags widget to be used in textual applications"
 readme = "README.md"
 authors = [
     { name = "Zaloog", email = "gramslars@gmail.com" }
@@ -11,6 +11,25 @@ dependencies = [
     "textual>=3.1.0",
     "textual-autocomplete>=4.0.4",
 ]
+license = { text = "MIT" }
+keywords = ["python", "textual", "tui", "tags", "uv"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.urls]
+Repository = "https://github.com/Zaloog/textual-tags"
+Changelog = "https://github.com/Zaloog/textual-tags/blob/main/CHANGELOG.md"
+
 
 [project.scripts]
 textual-tags = "textual_tags.demo:run_demo"
