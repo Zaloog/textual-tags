@@ -4,7 +4,17 @@ from textual.content import Content
 from textual.widgets import Input, Switch, Label, Rule
 from textual_tags import Tags
 
-DEMO_TAGS = ["UV", "Terminal", "TCSS", "Textual", "Tags", "Widget", "Python"]
+DEMO_TAGS = [
+    "uv",
+    "Terminal",
+    "tcss",
+    "Textual",
+    "Tags",
+    "Widget",
+    "Python",
+    "TUI",
+    "Highlander",
+]
 
 
 class DemoApp(App):

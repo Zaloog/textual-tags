@@ -35,6 +35,16 @@ class TagAutoComplete(AutoComplete):
 class TagInput(Input):
     DEFAULT_CSS = """
     TagInput {
+        margin:0;
+        padding:0;
+        height: auto;
+        width: auto;
+        min-width:20;
+        border:none;
+
+        & > :focus {
+            border:none;
+        }
     }
     """
 
@@ -50,16 +60,19 @@ class TagInput(Input):
 class Tag(Label):
     DEFAULT_CSS = """
     Tag {
-        background:$success;
+        margin:0 1 0 0 ;
+        color:$primary-lighten-2;
+        background:$panel;
 
         &:hover {
             background:$primary-darken-2;
-            tint: 20%;
+            tint: 10%;
         }
         &:focus {
             background:$primary-darken-2;
-            tint: 20%;
+            tint: 10%;
         }
+
     }
     """
     RIGHT_END = "\ue0b4"
@@ -111,6 +124,9 @@ class Tag(Label):
 class Tags(FlexBoxContainer):
     DEFAULT_CSS = """
     Tags {
+        padding:0 0 0 1 ;
+        height:auto;
+        min-height:3;
     }
     """
 

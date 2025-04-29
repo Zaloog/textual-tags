@@ -1,9 +1,8 @@
 Tags {
     padding:0 0 0 1 ;
     height:auto;
-    min-height:5;
+    min-height:3;
     width:50;
-    border:tall $primary;
 }
 TagInput {
     margin:0;
