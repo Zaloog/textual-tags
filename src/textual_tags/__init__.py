@@ -122,15 +122,18 @@ class Tags(FlexBoxContainer):
 
     def __init__(
         self,
-        tag_values: list | set | None = None,
+        tag_values: list | set,
         show_x: bool = False,
         start_with_tags_selected: bool = True,
-        allow_new_tags: reactive[bool] = reactive(False),
+        allow_new_tags: bool = False,
+        id: str | None = None,
+        classes: str | None = None,
+        disabled: bool = False,
     ) -> None:
         """A tags widget to select/unselect predefined or add new ones.
 
         Args:
-            tag_values: The available tags for this widget
+            tag_values: The available tags for this widget, will be turned into a set internally, if a list is provided
             show_x: Puts a `X` behind the actual tag-label (default=False)
             start_with_tags_selected: All Tags will be selected on initialisation (default=True)
             allow_new_tags: Allow adding any value as tag, not just predefined ones (default=False)
@@ -139,13 +142,14 @@ class Tags(FlexBoxContainer):
             classes: The CSS classes of the widget.
             disabled: Whether the widget is disabled.
         """
+        # Use a set to remove duplicate tags
         if isinstance(tag_values, list):
             tag_values_set = set(tag_values)
 
-        super().__init__()
+        super().__init__(id=id, classes=classes, disabled=disabled)
         self.tag_values = tag_values_set
         self.show_x = show_x
-        # self.allow_new_tags = allow_new_tags
+        self.allow_new_tags = allow_new_tags
         self.start_with_tags_selected = start_with_tags_selected
 
     async def on_mount(self):
@@ -237,7 +241,8 @@ class Tags(FlexBoxContainer):
 
         option_list.highlighted = highlighted
 
-    def watch_selected_tags(self):
+    async def watch_selected_tags(self):
+        """hide input if all tags are selected and no new tags are allowed"""
         if self.allow_new_tags:
             return
         if not self.unselected_tags:
@@ -245,14 +250,14 @@ class Tags(FlexBoxContainer):
         else:
             self.query_one(TagInput).styles.display = "block"
 
-    def watch_allow_new_tags(self):
+    async def watch_allow_new_tags(self):
         if self.allow_new_tags:
             self.query_one(TagInput).styles.display = "block"
         else:
-            self.watch_selected_tags()
+            await self.watch_selected_tags()
 
     async def watch_tag_values(self):
-        self.watch_allow_new_tags()
+        await self.watch_allow_new_tags()
 
     @property
     def unselected_tags(self) -> set[str]:

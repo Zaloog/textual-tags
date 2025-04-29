@@ -11,7 +11,12 @@ class DemoApp(App):
     CSS_PATH = "assets/demo.tcss"
 
     def compose(self) -> ComposeResult:
-        yield Tags(tag_values=DEMO_TAGS)
+        yield Tags(
+            tag_values=DEMO_TAGS,
+            show_x=False,
+            start_with_tags_selected=True,
+            allow_new_tags=False,
+        )
         input = Input(
             placeholder="Add more tags to internal widget list",
             id="input_adder",
