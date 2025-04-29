@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+from textual.binding import Binding
 from textual.reactive import reactive
 from textual.app import RenderResult
 from textual.events import Key
 from textual.message import Message
 from textual.widgets import Input, Label
-from textual_autocomplete import AutoComplete, DropdownItem, TargetState
+from textual_autocomplete import (
+    AutoComplete,
+    DropdownItem,
+    TargetState,
+    AutoCompleteList,
+)
 
 from textual_tags.flexbox import FlexBoxContainer
 
@@ -82,6 +88,8 @@ class Tag(Label):
     def on_key(self, event: Key):
         if event.key == "enter":
             self.post_message(self.Removed(self))
+            event.prevent_default()
+            event.stop()
 
     def watch_show_x(self):
         self.render()
@@ -92,6 +100,12 @@ class Tags(FlexBoxContainer):
     Tags {
     }
     """
+
+    BINDINGS = [
+        Binding("ctrl+j", "next_hightlight", priority=True),
+        Binding("ctrl+k", "previous_hightlight", priority=True),
+    ]
+
     tag_values: reactive[set[str]] = reactive(set())
     show_x: reactive[bool] = reactive(False)
     allow_new_tags: reactive[bool] = reactive(False)
@@ -132,7 +146,6 @@ class Tags(FlexBoxContainer):
 
     async def _on_tag_removed(self, event: Tag.Removed):
         await event.tag.remove()
-        self.query_one(TagInput).focus()
 
     def update_autocomplete_candidates(self, state: TargetState) -> list[DropdownItem]:
         return [DropdownItem(unselected_tag) for unselected_tag in self.unselected_tags]
@@ -154,6 +167,32 @@ class Tags(FlexBoxContainer):
 
     def clear_tags(self):
         self.query(Tag).remove()
+
+    def action_next_hightlight(self):
+        option_list = self.query_one(TagAutoComplete).option_list
+        displayed = self.query_one(TagAutoComplete).display
+        highlighted = option_list.highlighted
+
+        if displayed:
+            highlighted = (highlighted + 1) % option_list.option_count
+        else:
+            self.query_one(TagAutoComplete).display = True
+            highlighted = 0
+
+        option_list.highlighted = highlighted
+
+    def action_previous_hightlight(self):
+        option_list = self.query_one(AutoCompleteList)
+        displayed = self.query_one(TagAutoComplete).display
+        highlighted = option_list.highlighted
+
+        if displayed:
+            highlighted = (highlighted - 1) % option_list.option_count
+        else:
+            self.query_one(TagAutoComplete).display = True
+            highlighted = 0
+
+        option_list.highlighted = highlighted
 
     @property
     def selected_tags(self) -> set[str]:
