@@ -41,6 +41,11 @@ class TagInput(Input):
     def on_focus(self):
         self.parent.query_one(TagAutoComplete).action_show()
 
+    async def on_key(self, event: Key):
+        if event.key == "backspace":
+            if not self.value:
+                await self.parent.reset_last_tag()
+
 
 class Tag(Label):
     DEFAULT_CSS = """
@@ -211,6 +216,16 @@ class Tags(FlexBoxContainer):
             self.tag_values.add(new_values)
         else:
             self.tag_values.update(new_values)
+        self.mutate_reactive(Tags.tag_values)
+
+    async def reset_last_tag(self):
+        if not self.allow_new_tags:
+            return
+        last_tag = self.query(Tag).last()
+        self.tag_values.remove(last_tag.value)
+        await last_tag.remove()
+        self.query_one(TagInput).value = last_tag.value
+        self.query_one(TagInput).cursor_position = len(last_tag.value)
         self.mutate_reactive(Tags.tag_values)
 
     def action_next_hightlight(self):
