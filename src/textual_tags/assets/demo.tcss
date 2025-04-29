@@ -28,11 +28,11 @@ Tag {
     }
 
 }
-#input_adder {
+.demo-widgets {
     width:50;
     border:$primary;
-}
-.switch-toggles {
-    width:50;
-    border:$primary;
+
+    &:focus-within {
+        border:$success;
+    }
 }

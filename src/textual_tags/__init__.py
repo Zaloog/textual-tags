@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Iterable
 
 from textual.binding import Binding
 from textual.reactive import reactive
@@ -78,21 +79,28 @@ class Tag(Label):
         # To prevent layout change if its toggled
         left_round_part = f"[{background} on {parent_background}]{self.LEFT_END}[/]"
         right_round_part = f"[{background} on {parent_background}]{self.RIGHT_END}[/]"
-        label_part = f"{self.renderable}" if self.show_x else f" {self.renderable}"
+        label_part = f"{self.value}" if self.show_x else f" {self.value}"
         x_part = " x" if self.show_x else " "
         return left_round_part + label_part + x_part + right_round_part
 
     def on_click(self):
-        self.post_message(self.Removed(self))
+        self.remove()
 
     def on_key(self, event: Key):
         if event.key == "enter":
-            self.post_message(self.Removed(self))
+            self.remove()
             event.prevent_default()
             event.stop()
 
     def watch_show_x(self):
         self.render()
+
+    def on_prune(self):
+        self.post_message(self.Removed(self))
+
+    @property
+    def value(self):
+        return self.renderable
 
 
 class Tags(FlexBoxContainer):
@@ -104,23 +112,27 @@ class Tags(FlexBoxContainer):
     BINDINGS = [
         Binding("ctrl+j", "next_hightlight", priority=True),
         Binding("ctrl+k", "previous_hightlight", priority=True),
+        Binding("ctrl+o", "clear_tags", priority=True),
     ]
 
     tag_values: reactive[set[str]] = reactive(set())
     show_x: reactive[bool] = reactive(False)
     allow_new_tags: reactive[bool] = reactive(False)
+    selected_tags: reactive[set[str]] = reactive(set())
 
     def __init__(
         self,
         tag_values: list | set | None = None,
         show_x: bool = False,
+        start_with_tags_selected: bool = True,
         allow_new_tags: reactive[bool] = reactive(False),
     ) -> None:
         """An autocomplete widget for filesystem paths.
 
         Args:
-            tag_values: The target input widget to autocomplete.
+            tag_values: The available tags for this widget
             show_x: Puts a `X` behind the actual tag-label (default=False)
+            start_with_tags_selected: All Tags will be selected on initialisation (default=True)
             allow_new_tags: Allow adding any value as tag, not just predefined ones (default=False)
             id: The DOM node id of the widget.
             classes: The CSS classes of the widget.
@@ -131,9 +143,14 @@ class Tags(FlexBoxContainer):
 
         super().__init__()
         self.tag_values = tag_values_set
+        self.show_x = show_x
+        # self.allow_new_tags = allow_new_tags
+        self.start_with_tags_selected = start_with_tags_selected
 
     def on_mount(self):
         self.query_one(TagInput).placeholder = "Enter a tag..."
+        if self.start_with_tags_selected:
+            self._populate_with_tags()
 
     def compose(self):
         tag_input = TagInput(id="input_tag")
@@ -144,8 +161,9 @@ class Tags(FlexBoxContainer):
             candidates=self.update_autocomplete_candidates,
         )
 
-    async def _on_tag_removed(self, event: Tag.Removed):
-        await event.tag.remove()
+    def _on_tag_removed(self, event: Tag.Removed):
+        self.selected_tags.remove(event.tag.value)
+        self.mutate_reactive(Tags.selected_tags)
 
     def update_autocomplete_candidates(self, state: TargetState) -> list[DropdownItem]:
         return [DropdownItem(unselected_tag) for unselected_tag in self.unselected_tags]
@@ -153,20 +171,40 @@ class Tags(FlexBoxContainer):
     async def _on_tag_auto_complete_applied(self, event: TagAutoComplete.Applied):
         await event.autocomplete.target.action_submit()
 
-    def on_input_submitted(self, event: Input.Submitted):
+    async def on_input_submitted(self, event: Input.Submitted):
         value = event.input.value.strip()
         # Dont allow empty Tags
         if not value:
             return
         if value in self.tag_values or self.allow_new_tags:
-            self.mount(Tag(value).data_bind(Tags.show_x), before="#input_tag")
+            await self.add_new_tag(value=value)
             self.query_one(Input).clear()
 
-            if value not in self.tag_values:
-                self.tag_values.add(value)
+    async def _populate_with_tags(self):
+        for tag in self.tag_values:
+            await self.add_new_tag(value=tag)
 
-    def clear_tags(self):
-        self.query(Tag).remove()
+    async def add_new_tag(self, value: str):
+        """Adds a new Tag and updates self.tag_values if tag is not present"""
+        await self.mount(Tag(value).data_bind(Tags.show_x), before="#input_tag")
+        self.selected_tags.add(value)
+
+        if value not in self.tag_values:
+            self.tag_values.add(value)
+            self.mutate_reactive(Tags.tag_values)
+        self.mutate_reactive(Tags.selected_tags)
+
+    async def action_clear_tags(self):
+        """Removes all Tags"""
+        await self.query(Tag).remove()
+
+    def add_tag_values(self, new_values: str | Iterable[str]):
+        """Add new tags to self.tag_values which holds all available Tags for this widget"""
+        if isinstance(new_values, str):
+            self.tag_values.add(new_values)
+        else:
+            self.tag_values.update(new_values)
+        self.mutate_reactive(Tags.tag_values)
 
     def action_next_hightlight(self):
         option_list = self.query_one(TagAutoComplete).option_list
@@ -194,9 +232,22 @@ class Tags(FlexBoxContainer):
 
         option_list.highlighted = highlighted
 
-    @property
-    def selected_tags(self) -> set[str]:
-        return {tag.renderable for tag in self.query(Tag)}
+    def watch_selected_tags(self):
+        if self.allow_new_tags:
+            return
+        if not self.unselected_tags:
+            self.query_one(TagInput).styles.display = "none"
+        else:
+            self.query_one(TagInput).styles.display = "block"
+
+    def watch_allow_new_tags(self):
+        if self.allow_new_tags:
+            self.query_one(TagInput).styles.display = "block"
+        else:
+            self.watch_selected_tags()
+
+    async def watch_tag_values(self):
+        self.watch_allow_new_tags()
 
     @property
     def unselected_tags(self) -> set[str]:
