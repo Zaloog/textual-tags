@@ -1,6 +1,7 @@
 from textual import on
 from textual.app import App, ComposeResult
-from textual.widgets import Input, Switch
+from textual.content import Content
+from textual.widgets import Input, Switch, Label, Rule
 from textual_tags import Tags
 
 DEMO_TAGS = ["UV", "Terminal", "TCSS", "Textual", "Tags", "Widget", "Python"]
@@ -18,9 +19,25 @@ class DemoApp(App):
         )
         input.border_title = "Add more Tags here"
         switch_x = Switch(id="switch_x", classes="demo-widgets")
-        switch_x.border_title = "Show X at end of each tag"
+        switch_x.border_title = "Show X at end of each tag [$warning](default=False)[/]"
         switch_new = Switch(id="switch_new", classes="demo-widgets")
-        switch_new.border_title = "Allow New Tags"
+        switch_new.border_title = "Allow New Tags [$warning](default=False)[/]"
+        yield Rule(classes="description")
+        yield Label(
+            Content.from_markup(
+                "You can display and navigate completion options with [$success]ctrl+j/k[/] or [$success]up/down[/]"
+            ),
+            classes="description",
+        )
+
+        yield Rule(classes="description")
+        yield Label(
+            Content.from_markup(
+                "Click or press enter while a tag is focused to unselect Tag, [$success]ctrl+o[/] on the tags widget unselects all"
+            ),
+            classes="description",
+        )
+        yield Rule(classes="description")
         yield input
         yield switch_x
         yield switch_new
@@ -32,13 +49,12 @@ class DemoApp(App):
         self.query_one(Tags).add_tag_values(event.input.value)
         event.input.clear()
 
-    @on(Switch.Changed, "#switch_x")
-    def update_show_x(self, event: Switch.Changed):
-        self.query_one(Tags).show_x = event.switch.value
-
-    @on(Switch.Changed, "#switch_new")
-    def update_allow_new_tags(self, event: Switch.Changed):
-        self.query_one(Tags).allow_new_tags = event.switch.value
+    def on_switch_changed(self, event: Switch.Changed):
+        match event.switch.id:
+            case "switch_x":
+                self.query_one(Tags).show_x = event.switch.value
+            case "switch_new":
+                self.query_one(Tags).allow_new_tags = event.switch.value
 
 
 def run_demo():

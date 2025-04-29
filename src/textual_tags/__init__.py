@@ -127,13 +127,14 @@ class Tags(FlexBoxContainer):
         start_with_tags_selected: bool = True,
         allow_new_tags: reactive[bool] = reactive(False),
     ) -> None:
-        """An autocomplete widget for filesystem paths.
+        """A tags widget to select/unselect predefined or add new ones.
 
         Args:
             tag_values: The available tags for this widget
             show_x: Puts a `X` behind the actual tag-label (default=False)
             start_with_tags_selected: All Tags will be selected on initialisation (default=True)
             allow_new_tags: Allow adding any value as tag, not just predefined ones (default=False)
+            start_with_tags_selected: All available tags are already selected (default=True)
             id: The DOM node id of the widget.
             classes: The CSS classes of the widget.
             disabled: Whether the widget is disabled.
@@ -147,10 +148,10 @@ class Tags(FlexBoxContainer):
         # self.allow_new_tags = allow_new_tags
         self.start_with_tags_selected = start_with_tags_selected
 
-    def on_mount(self):
+    async def on_mount(self):
         self.query_one(TagInput).placeholder = "Enter a tag..."
         if self.start_with_tags_selected:
-            self._populate_with_tags()
+            await self._populate_with_tags()
 
     def compose(self):
         tag_input = TagInput(id="input_tag")
@@ -197,6 +198,8 @@ class Tags(FlexBoxContainer):
     async def action_clear_tags(self):
         """Removes all Tags"""
         await self.query(Tag).remove()
+        self.query_one(TagInput).cursor_position = 0
+        self.query_one(TagInput).focus()
 
     def add_tag_values(self, new_values: str | Iterable[str]):
         """Add new tags to self.tag_values which holds all available Tags for this widget"""
@@ -207,6 +210,7 @@ class Tags(FlexBoxContainer):
         self.mutate_reactive(Tags.tag_values)
 
     def action_next_hightlight(self):
+        """go to next hightlight in completion option list"""
         option_list = self.query_one(TagAutoComplete).option_list
         displayed = self.query_one(TagAutoComplete).display
         highlighted = option_list.highlighted
@@ -220,6 +224,7 @@ class Tags(FlexBoxContainer):
         option_list.highlighted = highlighted
 
     def action_previous_hightlight(self):
+        """go to previous hightlight in completion option list"""
         option_list = self.query_one(AutoCompleteList)
         displayed = self.query_one(TagAutoComplete).display
         highlighted = option_list.highlighted

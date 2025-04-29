@@ -28,6 +28,10 @@ Tag {
     }
 
 }
+.description {
+ margin:0;
+ width:50;
+}
 .demo-widgets {
     width:50;
     border:$primary;
