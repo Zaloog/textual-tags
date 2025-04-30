@@ -151,14 +151,13 @@ class Tags(FlexBoxContainer):
         classes: str | None = None,
         disabled: bool = False,
     ) -> None:
-        """A tags widget to select/unselect predefined or add new ones.
+        """A tags widget to select/unselect predefined Tags or add new ones.
 
         Args:
             tag_values: The available tags for this widget, will be turned into a set internally, if a list is provided
             show_x: Puts a `X` behind the actual tag-label (default=False)
             start_with_tags_selected: All Tags will be selected on initialisation (default=True)
             allow_new_tags: Allow adding any value as tag, not just predefined ones (default=False)
-            start_with_tags_selected: All available tags are already selected (default=True)
             id: The DOM node id of the widget.
             classes: The CSS classes of the widget.
             disabled: Whether the widget is disabled.
