@@ -260,7 +260,8 @@ class Tags(FlexBoxContainer):
 
         if value not in self.tag_values:
             self.tag_values.add(value)
-            self.mutate_reactive(Tags.tag_values)
+
+        self.mutate_reactive(Tags.tag_values)
         self.mutate_reactive(Tags.selected_tags)
 
     async def action_clear_tags(self):

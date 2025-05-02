@@ -74,9 +74,10 @@ class DemoApp(App):
             case "switch_new":
                 self.query_one(Tags).allow_new_tags = event.switch.value
 
-    async def on_button_pressed(self, event: Button.Pressed):
+    def on_button_pressed(self, event: Button.Pressed):
         self.notify("All Tags mounted")
-        await self.query_one(Tags)._populate_with_tags()
+        tags = self.query_one(Tags)
+        tags.call_later(tags._populate_with_tags)
 
     def on_tag_focused(self, event: Tag.Focused):
         self.notify(f"Tag {event.tag.value} focused", timeout=1)

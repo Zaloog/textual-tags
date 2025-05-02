@@ -93,6 +93,8 @@ if __name__ == '__main__':
 ## Messages
 Tags sends two messages:
 - `Tag.Removed`, send when a tag is removed in any way
+- `Tag.Focused`, send when a tag is focused
+- `Tag.Hovered`, send when a tag is hovered
 - `TagAutoComplete.Applied`, send when a completion option is applied
 
 ## Issues/Feedback
