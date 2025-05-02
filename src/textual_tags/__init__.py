@@ -90,6 +90,24 @@ class Tag(Label):
         def control(self):
             return self.tag
 
+    class Focused(Message):
+        def __init__(self, tag: Tag) -> None:
+            self.tag = tag
+            super().__init__()
+
+        @property
+        def control(self):
+            return self.tag
+
+    class Hovered(Message):
+        def __init__(self, tag: Tag) -> None:
+            self.tag = tag
+            super().__init__()
+
+        @property
+        def control(self):
+            return self.tag
+
     def render(self) -> RenderResult:
         background = self.styles.background.hex
         parent_background = self.colors[0].hex
@@ -115,6 +133,12 @@ class Tag(Label):
 
     def on_prune(self):
         self.post_message(self.Removed(self))
+
+    def on_focus(self):
+        self.post_message(self.Focused(self))
+
+    def on_enter(self):
+        self.post_message(self.Hovered(self))
 
     @property
     def value(self):

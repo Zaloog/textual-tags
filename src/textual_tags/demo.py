@@ -2,7 +2,7 @@ from textual import on
 from textual.app import App, ComposeResult
 from textual.content import Content
 from textual.widgets import Input, Switch, Label, Rule
-from textual_tags import Tags
+from textual_tags import Tags, Tag
 
 DEMO_TAGS = [
     "uv",
@@ -70,6 +70,12 @@ class DemoApp(App):
                 self.query_one(Tags).show_x = event.switch.value
             case "switch_new":
                 self.query_one(Tags).allow_new_tags = event.switch.value
+
+    def on_tag_focused(self, event: Tag.Focused):
+        self.notify(f"Tag {event.tag.value} focused", timeout=1)
+
+    def on_tag_hovered(self, event: Tag.Hovered):
+        self.notify(f"Tag {event.tag.value} hovered", timeout=1)
 
 
 def run_demo():
