@@ -1,7 +1,7 @@
 from textual import on
 from textual.app import App, ComposeResult
 from textual.content import Content
-from textual.widgets import Input, Switch, Label, Rule
+from textual.widgets import Input, Switch, Label, Rule, Button
 from textual_tags import Tags, Tag
 
 DEMO_TAGS = [
@@ -37,6 +37,8 @@ class DemoApp(App):
         switch_x.border_title = "Show X at end of each tag [$warning](default=False)[/]"
         switch_new = Switch(id="switch_new", classes="demo-widgets")
         switch_new.border_title = "Allow New Tags [$warning](default=False)[/]"
+        button_all = Button("Mount All", id="button_all", variant="success")
+
         yield Rule(classes="description")
         yield Label(
             Content.from_markup(
@@ -56,6 +58,7 @@ class DemoApp(App):
         yield input
         yield switch_x
         yield switch_new
+        yield button_all
 
         return super().compose()
 
@@ -70,6 +73,10 @@ class DemoApp(App):
                 self.query_one(Tags).show_x = event.switch.value
             case "switch_new":
                 self.query_one(Tags).allow_new_tags = event.switch.value
+
+    async def on_button_pressed(self, event: Button.Pressed):
+        self.notify("All Tags mounted")
+        await self.query_one(Tags)._populate_with_tags()
 
     def on_tag_focused(self, event: Tag.Focused):
         self.notify(f"Tag {event.tag.value} focused", timeout=1)

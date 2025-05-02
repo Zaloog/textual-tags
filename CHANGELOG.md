@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.2.0
+- Add `Tag.Focused` and `Tag.Hovered` messages that fire, if a `Tag` is hovered or focused
+
 ## v0.1.2
 - fix duplication in Tags docstring
 

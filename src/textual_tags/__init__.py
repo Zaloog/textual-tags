@@ -250,7 +250,8 @@ class Tags(FlexBoxContainer):
 
     async def _populate_with_tags(self):
         for tag in self.tag_values:
-            await self.add_new_tag(value=tag)
+            if tag not in self.selected_tags:
+                await self.add_new_tag(value=tag)
 
     async def add_new_tag(self, value: str):
         """Adds a new Tag and updates self.tag_values if tag is not present"""
@@ -263,8 +264,15 @@ class Tags(FlexBoxContainer):
         self.mutate_reactive(Tags.selected_tags)
 
     async def action_clear_tags(self):
+        await self.unselect_all_tags()
+        self._put_focus_back_on_input()
+
+    async def unselect_all_tags(self):
         """Removes all Tags"""
         await self.query(Tag).remove()
+
+    def _put_focus_back_on_input(self):
+        """Focus back on input after tag clear"""
         self.query_one(TagInput).cursor_position = 0
         self.query_one(TagInput).focus()
 
