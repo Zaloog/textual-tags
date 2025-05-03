@@ -168,9 +168,6 @@ class Tag(Label):
             event.prevent_default()
             event.stop()
 
-    def watch_show_x(self):
-        self.render()
-
     def on_prune(self):
         self.post_message(self.Removed(self))
 
