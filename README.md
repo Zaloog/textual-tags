@@ -95,6 +95,7 @@ Tags sends two messages:
 - `Tag.Removed`, send when a tag is removed in any way
 - `Tag.Focused`, send when a tag is focused
 - `Tag.Hovered`, send when a tag is hovered
+- `Tag.Selected`, send when a tag is selected
 - `TagAutoComplete.Applied`, send when a completion option is applied
 
 ## Issues/Feedback

@@ -4,7 +4,7 @@ from typing import Iterable
 from textual.binding import Binding
 from textual.reactive import reactive
 from textual.app import RenderResult
-from textual.events import Key
+from textual.events import Key, Click
 from textual.message import Message
 from textual.widgets import Input, Label
 from textual_autocomplete import (
@@ -13,6 +13,7 @@ from textual_autocomplete import (
     TargetState,
     AutoCompleteList,
 )
+from rich.text import Text
 
 from textual_tags.flexbox import FlexBoxContainer
 
@@ -108,22 +109,61 @@ class Tag(Label):
         def control(self):
             return self.tag
 
+    class Selected(Message):
+        def __init__(self, tag: Tag) -> None:
+            self.tag = tag
+            super().__init__()
+
+        @property
+        def control(self):
+            return self.tag
+
     def render(self) -> RenderResult:
         background = self.styles.background.hex
         parent_background = self.colors[0].hex
+
         # Add extra padding with single space if self.show_x == False
         # To prevent layout change if its toggled
-        left_round_part = f"[{background} on {parent_background}]{self.LEFT_END}[/]"
-        right_round_part = f"[{background} on {parent_background}]{self.RIGHT_END}[/]"
-        label_part = f"{self.value}" if self.show_x else f" {self.value}"
-        x_part = " x" if self.show_x else " "
-        return left_round_part + label_part + x_part + right_round_part
+        left_round_part = Text.from_markup(
+            f"[{background} on {parent_background}]{self.LEFT_END}[/]"
+        )
+        right_round_part = Text.from_markup(
+            f"[{background} on {parent_background}]{self.RIGHT_END}[/]"
+        )
+        label_part = Text.from_markup(
+            f"{self.value}" if self.show_x else f" {self.value}"
+        )
+        x_part = Text.from_markup(
+            " x" if self.show_x else " ", style="red" if self._mouse_over_x() else ""
+        )
+        return Text.assemble(left_round_part, label_part, x_part, right_round_part)
 
-    def on_click(self):
-        self.remove()
+    def _mouse_over_x(self):
+        is_over_widget = self.mouse_hover
+        is_over_x = self.show_x and (
+            self.app.mouse_position.x >= (self.region.x + self.region.width - 3)
+        )
+        should_highlight_x = is_over_widget and is_over_x
+        return should_highlight_x
+
+    def on_mouse_move(self):
+        if self._mouse_over_x():
+            self.refresh()
+
+    def on_click(self, event: Click):
+        if self._mouse_over_x():
+            self.remove()
+            event.prevent_default()
+            event.stop()
+        else:
+            self.post_message(self.Selected(self))
 
     def on_key(self, event: Key):
         if event.key == "enter":
+            self.post_message(self.Selected(self))
+            event.prevent_default()
+            event.stop()
+        elif event.key == "backspace":
             self.remove()
             event.prevent_default()
             event.stop()

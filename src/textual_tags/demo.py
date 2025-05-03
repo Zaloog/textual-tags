@@ -51,7 +51,16 @@ class DemoApp(App):
         yield Rule(classes="description")
         yield Label(
             Content.from_markup(
-                "Click or press enter while a tag is focused to unselect Tag, [$success]ctrl+o[/] on the tags widget unselects all"
+                "Click or press enter while a tag is focused to send the Tag.Selected event,"
+                + " [$success]ctrl+o[/] on the tags widget unselects all tags."
+            ),
+            classes="description",
+        )
+        yield Rule(classes="description")
+        yield Label(
+            Content.from_markup(
+                "Clicking the [red]x[/] portion of the tag (requires show_x=True) or pressing [$success]backspace[/]"
+                + " will unselect the Tag"
             ),
             classes="description",
         )
@@ -85,6 +94,9 @@ class DemoApp(App):
 
     def on_tag_hovered(self, event: Tag.Hovered):
         self.notify(f"Tag {event.tag.value} hovered", timeout=1)
+
+    def on_tag_selected(self, event: Tag.Selected):
+        self.notify(f"Tag {event.tag.value} selected", timeout=1)
 
 
 def run_demo():

@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.0
+- Make the x-part clickable and distinguishable to unselect tags.
+Also backspace now unselects the focused tags. Enter and normal clicking will send
+the `Tag.Selected` Event instead
+
 ## v0.2.1
 - Fix error when trying to use ctrl+j/k on `Tag` when autocomplete menu was not displayed
 
