@@ -296,6 +296,8 @@ class Tags(FlexBoxContainer):
 
     def action_next_hightlight(self):
         """go to next hightlight in completion option list"""
+        if not isinstance(self.app.focused, TagInput):
+            return
         option_list = self.query_one(TagAutoComplete).option_list
         displayed = self.query_one(TagAutoComplete).display
         highlighted = option_list.highlighted
@@ -310,6 +312,8 @@ class Tags(FlexBoxContainer):
 
     def action_previous_hightlight(self):
         """go to previous hightlight in completion option list"""
+        if not isinstance(self.app.focused, TagInput):
+            return
         option_list = self.query_one(AutoCompleteList)
         displayed = self.query_one(TagAutoComplete).display
         highlighted = option_list.highlighted

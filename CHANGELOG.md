@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.2.1
+- Fix error when trying to use ctrl+j/k on `Tag` when autocomplete menu was not displayed
+
 ## v0.2.0
 - Fix the _populate_with_tags function
 - Add `Tag.Focused` and `Tag.Hovered` messages that fire, if a `Tag` is hovered or focused

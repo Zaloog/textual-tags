@@ -43,6 +43,7 @@ class DemoApp(App):
         yield Label(
             Content.from_markup(
                 "You can display and navigate completion options with [$success]ctrl+j/k[/] or [$success]up/down[/]"
+                + " when the TagInput widget is focused."
             ),
             classes="description",
         )
