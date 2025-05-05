@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.1
+- Fix Typo in action functions to navigate highlights and
+Changed highlight navigation to a single function which takes up/down arguments
+
 ## v0.3.0
 - Make the x-part clickable and distinguishable to unselect tags.
 Also backspace now unselects the focused tags. Enter and normal clicking will send

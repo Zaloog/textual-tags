@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Iterable
+from typing import Iterable, Literal
 
 from textual.binding import Binding
 from textual.reactive import reactive
@@ -11,7 +11,6 @@ from textual_autocomplete import (
     AutoComplete,
     DropdownItem,
     TargetState,
-    AutoCompleteList,
 )
 from rich.text import Text
 
@@ -192,8 +191,8 @@ class Tags(FlexBoxContainer):
     """
 
     BINDINGS = [
-        Binding("ctrl+j", "next_hightlight", priority=True),
-        Binding("ctrl+k", "previous_hightlight", priority=True),
+        Binding("ctrl+j", "navigate_highlight('down')", priority=True),
+        Binding("ctrl+k", "navigate_highlight('up')", priority=True),
         Binding("ctrl+o", "clear_tags", priority=True),
     ]
 
@@ -331,32 +330,17 @@ class Tags(FlexBoxContainer):
         self.query_one(TagInput).value = last_tag.value
         self.query_one(TagInput).cursor_position = len(last_tag.value)
 
-    def action_next_hightlight(self):
+    def action_navigate_highlight(self, direction: Literal["up", "down"]):
         """go to next hightlight in completion option list"""
         if not isinstance(self.app.focused, TagInput):
             return
         option_list = self.query_one(TagAutoComplete).option_list
         displayed = self.query_one(TagAutoComplete).display
         highlighted = option_list.highlighted
+        int_direction = 1 if direction == "down" else -1
 
         if displayed:
-            highlighted = (highlighted + 1) % option_list.option_count
-        else:
-            self.query_one(TagAutoComplete).display = True
-            highlighted = 0
-
-        option_list.highlighted = highlighted
-
-    def action_previous_hightlight(self):
-        """go to previous hightlight in completion option list"""
-        if not isinstance(self.app.focused, TagInput):
-            return
-        option_list = self.query_one(AutoCompleteList)
-        displayed = self.query_one(TagAutoComplete).display
-        highlighted = option_list.highlighted
-
-        if displayed:
-            highlighted = (highlighted - 1) % option_list.option_count
+            highlighted = (highlighted + int_direction) % option_list.option_count
         else:
             self.query_one(TagAutoComplete).display = True
             highlighted = 0

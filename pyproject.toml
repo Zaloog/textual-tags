@@ -1,6 +1,6 @@
 [project]
 name = "textual-tags"
-version = "0.3.0"
+version = "0.3.1"
 description = "A custom tags widget to be used in textual applications"
 readme = "README.md"
 authors = [
