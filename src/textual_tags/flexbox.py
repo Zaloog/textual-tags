@@ -28,10 +28,7 @@ class FlexBoxLayout(Layout):
     name = "flexbox"
 
     def arrange(
-        self,
-        parent: Widget,
-        children: list[Widget],
-        size: Size,
+        self, parent: Widget, children: list[Widget], size: Size, greedy: bool
     ) -> ArrangeResult:
         """Generate a layout map that defines where the widgets will be drawn.
         Args:

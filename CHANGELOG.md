@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.3.2
+- Add missing greedy parameter to custom FlexboxLayout
+
 ## v0.3.1
 - Fix Typo in action functions to navigate highlights and
 Changed highlight navigation to a single function which takes up/down arguments
