@@ -178,7 +178,10 @@ class Tag(Label):
 
     @property
     def value(self):
-        return self.renderable
+        try:
+            return self.renderable
+        except AttributeError:
+            return self.content
 
 
 class Tags(FlexBoxContainer):
