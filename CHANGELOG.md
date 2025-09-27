@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.3.3
+- Add Support for textual 6.X
+
 ## v0.3.2
 - Add missing greedy parameter to custom FlexboxLayout
 
